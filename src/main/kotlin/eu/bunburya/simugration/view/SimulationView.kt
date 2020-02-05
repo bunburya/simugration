@@ -11,7 +11,7 @@ class SimulationView : View("Simulation") {
             label("View:")
             button("Population").setOnAction { controller.drawPopulation() }
             button("Resources").setOnAction { controller.drawResources() }
-            button("Terrain").setOnAction { controller.drawTerrain() }
+            button("Elevation").setOnAction { controller.drawElevation() }
         }
         center(GridView::class)
         bottom(SimInfoView::class)

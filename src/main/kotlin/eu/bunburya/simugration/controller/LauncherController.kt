@@ -1,8 +1,7 @@
 package eu.bunburya.simugration.controller
 
-import eu.bunburya.simugration.model.SimConfig
+import eu.bunburya.simugration.model.config.SimConfig
 import eu.bunburya.simugration.view.LauncherView
-import eu.bunburya.simugration.view.SimulationView
 import tornadofx.Controller
 
 /**

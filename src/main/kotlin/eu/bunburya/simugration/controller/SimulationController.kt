@@ -1,7 +1,7 @@
 package eu.bunburya.simugration.controller
 
 import eu.bunburya.simugration.model.cell.CellData
-import eu.bunburya.simugration.model.SimConfig
+import eu.bunburya.simugration.model.config.SimConfig
 import eu.bunburya.simugration.model.cell.Cell
 import eu.bunburya.simugration.model.cell.CellGroup
 import eu.bunburya.simugration.model.grid.Grid
@@ -33,7 +33,7 @@ class SimulationController: Controller() {
 
     fun getPopulation(cell: Cell) = getCellInfo(cell).population
     fun getResources(cell: Cell) = getCellInfo(cell).resources
-    fun getTerrain(cell: Cell) = getCellInfo(cell).terrain
+    fun getElevation(cell: Cell) = getCellInfo(cell).elevation
 
     fun startSimulation() {
         grid = HexGrid(simConfig)
@@ -87,7 +87,7 @@ class SimulationController: Controller() {
 
     // Functions for drawing to gridView
 
-    fun getCellColor(range: IntRange, value: Int): Color {
+    fun getCellColor(range: IntRange, value: Number): Color {
         val green = value.toDouble() / range.last
         val red = 1.0 - green
         return Color.color(red, green, 0.0)
@@ -95,7 +95,7 @@ class SimulationController: Controller() {
 
     fun drawPopulation() = gridView.draw(simConfig.populationRange, this::getPopulation)
     fun drawResources() = gridView.draw(simConfig.resourcesRange, this::getResources)
-    fun drawTerrain() = gridView.draw(simConfig.terrainRange, this::getTerrain)
+    fun drawElevation() = gridView.draw(simConfig.elevationRange, this::getElevation)
 
     fun clear() {
         cellPolygonMap.clear()

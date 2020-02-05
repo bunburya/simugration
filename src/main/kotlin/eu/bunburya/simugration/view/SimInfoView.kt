@@ -12,25 +12,27 @@ class SimInfoView : View("Simulation Info") {
     var cellCoordText: Label by singleAssign()
     var cellPopulationText: Label by singleAssign()
     var cellResourcesText: Label by singleAssign()
-    var cellTerrainText: Label by singleAssign()
+    var cellElevationText: Label by singleAssign()
+    var cellDesirabilityText: Label by singleAssign()
 
     override val root = vbox {
         cellCoordText = label()
         cellPopulationText = label()
         cellResourcesText = label()
-        cellTerrainText = label()
+        cellElevationText = label()
+        cellDesirabilityText = label()
     }
 
     fun updateCellLabels(coordText: String = "", populationText: String = "", resourcesText: String = "",
-                         terrainText: String = "") {
+                         elevationText: String = "", desirabilityText: String = "") {
         cellCoordText.text = coordText
         cellPopulationText.text = populationText
         cellResourcesText.text = resourcesText
-        cellTerrainText.text = terrainText
+        cellElevationText.text = elevationText
+        cellDesirabilityText.text = desirabilityText
     }
 
     fun updateCellData(selectedCells: CellGroup) {
-        println("Updating cell data")
         when (selectedCells.size) {
             0 -> updateCellLabels("No cell selected")
             1 -> {
@@ -43,7 +45,8 @@ class SimInfoView : View("Simulation Info") {
                     "Coordinates:\t($x, $y)",
                     "Population:\t${cellData.population}",
                     "Resources:\t${cellData.resources}",
-                    "Terrain:\t${cellData.terrain}"
+                    "Elevation:\t${cellData.elevation}",
+                    "Desirability:\t${cellData.desirability}"
                 )
             }
             else -> {
@@ -51,7 +54,8 @@ class SimInfoView : View("Simulation Info") {
                     "${selectedCells.size} cells selected",
                     "Mean population:\t${selectedCells.meanPopulation}",
                     "Mean resources:\t${selectedCells.meanResources}",
-                    "Mean terrain:\t${selectedCells.meanTerrain}"
+                    "Mean elevation:\t${selectedCells.meanElevation}",
+                    "Mean desirability:\t${selectedCells.meanDesirability}"
                 )
             }
         }

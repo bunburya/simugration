@@ -13,7 +13,7 @@ class GridView: View("HexGrid View") {
 
     fun clear() = root.children.clear()
 
-    fun draw(range: IntRange, valueFunc: (Cell) -> Int) {
+    fun draw(range: IntRange, valueFunc: (Cell) -> Number) {
         for (cell in controller.cells) {
             val p = controller.cellPolygonMap[cell]
             if (p == null) {
