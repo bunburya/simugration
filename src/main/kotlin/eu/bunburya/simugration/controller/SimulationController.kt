@@ -13,6 +13,7 @@ import eu.bunburya.simugration.view.SimulationView
 import javafx.scene.paint.Color
 import javafx.scene.shape.Polygon
 import tornadofx.Controller
+import kotlin.math.min
 import kotlin.properties.Delegates
 
 const val STROKE_WIDTH = 1.0
@@ -110,7 +111,7 @@ class SimulationController: Controller() {
         return Color.color(red, green, 0.0)
     }
     fun getCellColor(range: ClosedFloatingPointRange<Double>, value: Number): Color {
-        val green = value.toDouble() / range.endInclusive
+        val green = min(value.toDouble() / range.endInclusive, 1.0)
         val red = 1.0 - green
         return Color.color(red, green, 0.0)
     }
