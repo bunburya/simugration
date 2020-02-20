@@ -24,7 +24,7 @@ class RandomInitialState(override val simConfig: SimConfig): InitialState {
     }
 
     override fun getElevation(cellData: CellData): Double {
-        return simConfig.elevationRange.random() as Double
+        return simConfig.elevationRange.random()
     }
 
 }
@@ -54,7 +54,7 @@ class AveragedRandomElevation(override val simConfig: SimConfig): InitialState {
     }
 
     override fun getElevation(cellData: CellData): Double {
-        val cellsToAverage: List<CellData> = cellData.neighbours.filterNotNull() + cellData
+        val cellsToAverage: List<CellData> = cellData.neighbourGroup.values + cellData
         val randomValuesToAverage: List<Double> = cellsToAverage.map { getRandomValue(it) }
         return randomValuesToAverage.average()
     }
@@ -74,7 +74,7 @@ class SinePopInitialState(override val simConfig: SimConfig): InitialState {
     }
 
     override fun getElevation(cellData: CellData): Double {
-        return simConfig.elevationRange.random() as Double
+        return simConfig.elevationRange.random()
     }
 }
 

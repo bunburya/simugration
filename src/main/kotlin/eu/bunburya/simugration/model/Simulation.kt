@@ -3,12 +3,20 @@ package eu.bunburya.simugration.model
 import eu.bunburya.simugration.model.cell.CellData
 import eu.bunburya.simugration.model.config.SimConfig
 import eu.bunburya.simugration.model.grid.Grid
-import kotlin.math.roundToInt
 
 class Simulation(val simConfig: SimConfig, val grid: Grid) {
 
+    /*
+     * calculateMigration is a function to calculate the migration between the cells represented by cellData1 and
+     * cellData2, for one step of the simulation.  It should return an Int representing the number of population to
+     * migrate.  A positive number means that the migration flows from the first provided cell to the second; a negative
+     * number means the migration flows from the second provided cell to the first.
+     */
+    val calculateMigration = simConfig.simRules::migrationFunc
+
     fun step() {
         val migrationRecord = calculateAllMigrations()
+        //println(migrationRecord)
         return applyMigrations(migrationRecord)
 
     }
@@ -18,35 +26,21 @@ class Simulation(val simConfig: SimConfig, val grid: Grid) {
         val processedNeighbours = mutableMapOf<CellData, MutableList<CellData>>()
         var cellData: CellData
         var processed: MutableList<CellData>
+        var migration: Int
         for (entry in grid) {
             cellData = entry.value
             if (cellData !in processedNeighbours.keys) processedNeighbours[cellData] = mutableListOf()
-            for (n in cellData.neighbours.filterNotNull()) {
+            for (n in cellData.neighbourGroup.values) {
                 processed = processedNeighbours[cellData]!!
                 if (n !in processed) {
-                    calculateMigration(cellData, n!!, migrationRecord)
+                    migration = calculateMigration(cellData, n)
+                    if (migration > 0) migrationRecord[Pair(cellData, n)] = migration
+                    else if (migration < 0) migrationRecord[Pair(n, cellData)] = -migration
                     processedNeighbours[cellData]?.add(n)
                 }
             }
         }
         return migrationRecord
-    }
-
-    fun calculateMigration(cellData1: CellData, cellData2: CellData, migrationRecord: MutableMap<Pair<CellData, CellData>, Int>) {
-
-        var source: CellData
-        var dest: CellData
-        if (cellData1.desirability > cellData2.desirability) {
-            source = cellData2
-            dest = cellData1
-        } else if (cellData1.desirability < cellData2.desirability) {
-            source = cellData1
-            dest = cellData2
-        } else {
-            // desirability is equal
-            return
-        }
-        migrationRecord[Pair(source, dest)] = (source.migratablePopPerNeighbour * (1 - (dest.desirability / source.desirability))).roundToInt()
     }
 
     fun applyMigrations(migrationRecord: MutableMap<Pair<CellData, CellData>, Int>) {

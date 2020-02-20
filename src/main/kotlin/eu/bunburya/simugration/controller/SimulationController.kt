@@ -106,11 +106,12 @@ class SimulationController: Controller() {
     // Functions for drawing to gridView
 
     fun getCellColor(range: IntRange, value: Number): Color {
-        val green = value.toDouble() / range.last
+        val green = min(value.toDouble() / range.last, 1.0)
         val red = 1.0 - green
         return Color.color(red, green, 0.0)
     }
     fun getCellColor(range: ClosedFloatingPointRange<Double>, value: Number): Color {
+        // Values above the range are clipped (so all values above a certain number will be displayed the same colour)
         val green = min(value.toDouble() / range.endInclusive, 1.0)
         val red = 1.0 - green
         return Color.color(red, green, 0.0)
