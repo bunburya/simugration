@@ -1,6 +1,8 @@
 package eu.bunburya.simugration.model.config
 
 import kotlin.math.floor
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 class ImprovedPerlinNoise2D {
 
@@ -34,24 +36,42 @@ class ImprovedPerlinNoise2D {
 
     }
 
-    fun modifiedNoise(x: Double, y: Double, frequency: Int, amplitude: Double): Double {
+    fun modifiedNoise(x: Double, y: Double, frequency: Double, amplitude: Double): Double {
         return noise(frequency * x, frequency * y) * amplitude
     }
 
-    fun octaveNoise(x: Double, y: Double, octaves: Int, persistence: Double = 1.0): Double {
-        // TODO:  Use persistence
+    fun octaveNoise(x: Double, y: Double, octaves: Int, lacunarity: Double = 2.0, persistence: Double = 0.5): Double {
         var noiseValue = 0.0
-        var freq = 1
+        var freq = 1.0
         var amp = 1.0
         for (i in 1..octaves) {
             noiseValue += modifiedNoise(x, y, freq, amp)
-            freq *= 2
-            amp /= 2
+            freq *= lacunarity
+            amp *= persistence
         }
         return noiseValue
     }
 
-    fun grad(hash: Int, x: Double, y: Double): Double = when (hash and 3) {
+    fun getNoiseRange(octaves: Int, persistence: Double, buffer: Double = 0.3): ClosedFloatingPointRange<Double> {
+        // NOTE:  http://digitalfreepen.com/2017/06/20/range-perlin-noise.html suggests range of Perlin noise is
+        // [-sqrt(N/4), sqrt(N/4)].  However, we get some values slightly outside this range.  So we add a small buffer
+        // to each end of the range, so as to ensure that any values will always be within it.  When only using one
+        // octave of noise, 0.3 seems to work as a buffer.
+
+        // Because we add (successively smaller) values to the noise value when we use multiple octaves, we strictly
+        // speaking need to adjust the range we use for normalisation accordingly.  However, because adding multiple
+        // octaves together tends to produce fewer extreme results, we can probably get away with not expanding the
+        // range as much as strictly necessary (or with using a smaller buffer than we would otherwise need), provided
+        // that we handle any extreme results that fall outside the range (by, eg, clipping them to the edges of the
+        // range).
+        var rangeModifier = 0.0
+        for (i in 0 until octaves) {
+            rangeModifier += 1 * persistence.pow(i)
+        }
+        return (((-sqrt(0.5) - buffer) * rangeModifier)..((sqrt(0.5) + buffer)) * rangeModifier)
+    }
+
+    private fun grad(hash: Int, x: Double, y: Double): Double = when (hash and 3) {
         0 -> x + y
         1 -> -x + y
         2 -> x - y
@@ -59,14 +79,9 @@ class ImprovedPerlinNoise2D {
         else -> 0.0
     }
 
-    fun fade(t: Double): Double = t * t * t * (t * (t * 6 - 15) + 10)
+    private fun fade(t: Double): Double = t * t * t * (t * (t * 6 - 15) + 10)
 
-    fun lerp(t: Double, a: Double, b: Double): Double = a + t * (b - a)
-
-    fun normalize(value: Double, rawRange: ClosedFloatingPointRange<Double>,
-                  normizedRange: ClosedFloatingPointRange<Double>) {
-        TODO()
-    }
+    private fun lerp(t: Double, a: Double, b: Double): Double = a + t * (b - a)
 
     companion object {
         // This is the permutation table used in the reference implementation by Perlin himself at
@@ -84,7 +99,7 @@ class ImprovedPerlinNoise2D {
             235, 249, 14, 239, 107, 49, 192, 214, 31, 181, 199, 106, 157, 184, 84, 204, 176, 115, 121, 50, 45, 127, 4,
             150, 254, 138, 236, 205, 93, 222, 114, 67, 29, 24, 72, 243, 141, 128, 195, 78, 66, 215, 61, 156, 180
         )
-        val p = permutations + permutations
+        private val p = permutations + permutations
     }
 
 }

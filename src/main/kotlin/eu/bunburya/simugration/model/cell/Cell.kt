@@ -7,5 +7,6 @@ interface Cell {
     val neighbours: Array<Cell>
     val gridCoords: GridCoordinates
     val points: Array<Double>
+    val center: Pair<Double, Double>
 
 }

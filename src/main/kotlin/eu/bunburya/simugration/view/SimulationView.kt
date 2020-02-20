@@ -1,5 +1,6 @@
 package eu.bunburya.simugration.view
 
+import eu.bunburya.simugration.controller.GridAspect
 import eu.bunburya.simugration.controller.SimulationController
 import tornadofx.*
 
@@ -9,9 +10,10 @@ class SimulationView : View("Simulation") {
     override val root = borderpane {
         top = hbox {
             label("View:")
-            button("Population").setOnAction { controller.drawPopulation() }
-            button("Resources").setOnAction { controller.drawResources() }
-            button("Elevation").setOnAction { controller.drawElevation() }
+            button("Population").setOnAction { controller.draw(GridAspect.POPULATION) }
+            button("Resources").setOnAction { controller.draw(GridAspect.RESOURCES) }
+            button("Elevation").setOnAction { controller.draw(GridAspect.ELEVATION) }
+            button("Next step").setOnAction { controller.step() }
         }
         center(GridView::class)
         bottom(SimInfoView::class)

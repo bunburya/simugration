@@ -14,6 +14,10 @@ class GridView: View("HexGrid View") {
     fun clear() = root.children.clear()
 
     fun draw(range: IntRange, valueFunc: (Cell) -> Number) {
+        val floatRange = range.first.toDouble()..range.last.toDouble()
+        return draw(floatRange, valueFunc)
+    }
+    fun draw(range: ClosedFloatingPointRange<Double>, valueFunc: (Cell) -> Number) {
         for (cell in controller.cells) {
             val p = controller.cellPolygonMap[cell]
             if (p == null) {

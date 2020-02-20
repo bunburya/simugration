@@ -1,5 +1,6 @@
 package eu.bunburya.simugration.controller
 
+import eu.bunburya.simugration.model.Simulation
 import eu.bunburya.simugration.model.cell.CellData
 import eu.bunburya.simugration.model.config.SimConfig
 import eu.bunburya.simugration.model.cell.Cell
@@ -19,12 +20,21 @@ const val SELECTED_STROKE_WIDTH = 3.0
 
 class CellOutOfBoundsException(msg: String): Exception(msg)
 
+enum class GridAspect {
+    // The different views of the grid that you can select
+    POPULATION,
+    RESOURCES,
+    ELEVATION
+}
+
 class SimulationController: Controller() {
     private val simulationView:  SimulationView by inject()
     private val simInfoView: SimInfoView by inject()
     private val gridView: GridView by inject()
+    private var currentAspect: GridAspect = GridAspect.POPULATION
 
     var simConfig: SimConfig by Delegates.notNull()
+    var simulation: Simulation by Delegates.notNull()
     val cellPolygonMap = mutableMapOf<Cell, Polygon>()
     val selectedCells = CellGroup()
 
@@ -37,10 +47,17 @@ class SimulationController: Controller() {
 
     fun startSimulation() {
         grid = HexGrid(simConfig)
+        simulation = Simulation(simConfig, grid)
         clear()
-        drawPopulation()
+        draw()
         updateSimInfo()
         simulationView.openWindow()
+    }
+
+    fun step() {
+        simulation.step()
+        draw()
+        updateSimInfo()
     }
 
     // Functions for selecting cells
@@ -92,10 +109,26 @@ class SimulationController: Controller() {
         val red = 1.0 - green
         return Color.color(red, green, 0.0)
     }
+    fun getCellColor(range: ClosedFloatingPointRange<Double>, value: Number): Color {
+        val green = value.toDouble() / range.endInclusive
+        val red = 1.0 - green
+        return Color.color(red, green, 0.0)
+    }
 
     fun drawPopulation() = gridView.draw(simConfig.populationRange, this::getPopulation)
     fun drawResources() = gridView.draw(simConfig.resourcesRange, this::getResources)
     fun drawElevation() = gridView.draw(simConfig.elevationRange, this::getElevation)
+
+    fun draw(aspect: GridAspect = currentAspect) {
+        if (aspect != currentAspect) {
+            currentAspect = aspect
+        }
+        when (aspect) {
+            GridAspect.POPULATION -> drawPopulation()
+            GridAspect.RESOURCES -> drawResources()
+            GridAspect.ELEVATION -> drawElevation()
+        }
+    }
 
     fun clear() {
         cellPolygonMap.clear()

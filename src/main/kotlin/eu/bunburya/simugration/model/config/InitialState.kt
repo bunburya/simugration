@@ -82,7 +82,7 @@ class PerlinInitialState(override val simConfig: SimConfig): InitialState {
 
     val perlin = ImprovedPerlinNoise2D()
 
-    val octaves = 6
+    val octaves = 2
     val lacunarity = 2.0
     val persistence = 0.5
     val scale = 0.5
@@ -95,8 +95,8 @@ class PerlinInitialState(override val simConfig: SimConfig): InitialState {
             lacunarity,
             persistence
         )
-        val noiseRange = perlin.getNoiseRange(octaves, persistence, 0.1)
-        return normalize(noise,  noiseRange, simConfig.elevationRange)
+        val noiseRange = perlin.getNoiseRange(octaves, persistence, -0.1)
+        return normalize(noise,  noiseRange, simConfig.elevationRange, clipExtremes = true)
     }
 
     override fun getPopulation(cellData: CellData): Int {
