@@ -2,6 +2,7 @@ package eu.bunburya.simugration.controller
 
 import eu.bunburya.simugration.model.config.SimConfig
 import eu.bunburya.simugration.view.LauncherView
+import eu.bunburya.simugration.view.SimulationView
 import tornadofx.Controller
 
 /**
@@ -20,7 +21,9 @@ class LauncherController: Controller() {
         simConfig.gridHeight = gridHeight
         simConfig.populationRange = popRange
         simulationController.simConfig = simConfig
+        simulationController.guiConfig = DefaultGUIConfig(simConfig)
         simulationController.startSimulation()
+        view.replaceWith<SimulationView>()
     }
 
 }

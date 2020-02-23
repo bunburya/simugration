@@ -1,64 +1,85 @@
 package eu.bunburya.simugration.view
 
+import eu.bunburya.simugration.controller.RowData
 import eu.bunburya.simugration.controller.SimulationController
+import eu.bunburya.simugration.model.cell.CellData
 import eu.bunburya.simugration.model.cell.CellGroup
+import javafx.beans.property.*
 import javafx.scene.control.Label
+import javafx.scene.control.TableView
+import javafx.scene.layout.GridPane
+import javafx.scene.layout.Priority
+import javafx.scene.text.FontWeight
 import tornadofx.*
 
 class SimInfoView : View("Simulation Info") {
 
     val controller: SimulationController by inject()
 
-    var cellCoordText: Label by singleAssign()
-    var cellPopulationText: Label by singleAssign()
-    var cellResourcesText: Label by singleAssign()
-    var cellElevationText: Label by singleAssign()
-    var cellDesirabilityText: Label by singleAssign()
+    var cellInfoTable: TableView<RowData> by singleAssign()
+    var simInfoTable: GridPane by singleAssign()
 
-    override val root = vbox {
-        cellCoordText = label()
-        cellPopulationText = label()
-        cellResourcesText = label()
-        cellElevationText = label()
-        cellDesirabilityText = label()
-    }
+    var simStepLabel: Label by singleAssign()
+    var simMeanPopulationLabel: Label by singleAssign()
+    var simTotalPopulationLabel: Label by singleAssign()
+    var simMeanResourcesLabel: Label by singleAssign()
+    var simTotalResourcesLabel: Label by singleAssign()
+    var simMeanElevationLabel: Label by singleAssign()
+    var simTotalElevationLabel: Label by singleAssign()
+    var simMeanDesirabilityLabel: Label by singleAssign()
+    var simTotalDesirabilityLabel: Label by singleAssign()
 
-    fun updateCellLabels(coordText: String = "", populationText: String = "", resourcesText: String = "",
-                         elevationText: String = "", desirabilityText: String = "") {
-        cellCoordText.text = coordText
-        cellPopulationText.text = populationText
-        cellResourcesText.text = resourcesText
-        cellElevationText.text = elevationText
-        cellDesirabilityText.text = desirabilityText
-    }
-
-    fun updateCellData(selectedCells: CellGroup) {
-        when (selectedCells.size) {
-            0 -> updateCellLabels("No cell selected")
-            1 -> {
-                val entry = selectedCells.entries.toList()[0]
-                val cell = entry.key
-                val cellData = entry.value
-                val (x, y) = cell.gridCoords
-
-                updateCellLabels(
-                    "Coordinates:\t($x, $y)",
-                    "Population:\t${cellData.population}",
-                    "Resources:\t${cellData.resources}",
-                    "Elevation:\t${cellData.elevation}",
-                    "Desirability:\t${cellData.desirability}"
-                )
+    override val root = hbox {
+        cellInfoTable = tableview<RowData> {
+            column("Coords", RowData::coordsProperty)
+            column("Population", RowData::populationProperty)
+            column("Resources", RowData::resourcesProperty)
+            column("Elevation", RowData::elevationProperty)
+            column("Desirability", RowData::desirabilityProperty)
+            prefHeight = 150.0 // TODO:  Find a way to smartly set this, possibly by using CSS,
+            hgrow = Priority.ALWAYS
+        }
+        simInfoTable = gridpane {
+            row {
+                label("Step:")
+                simStepLabel = label()
             }
-            else -> {
-                updateCellLabels(
-                    "${selectedCells.size} cells selected",
-                    "Mean population:\t${selectedCells.meanPopulation}",
-                    "Mean resources:\t${selectedCells.meanResources}",
-                    "Mean elevation:\t${selectedCells.meanElevation}",
-                    "Mean desirability:\t${selectedCells.meanDesirability}"
-                )
+            row {
+                label()
+                label("Average").style { fontWeight = FontWeight.BOLD }
+                label("Total").style { fontWeight = FontWeight.BOLD }
+            }
+            row {
+                label("Population:")
+                    .gridpaneConstraints { marginRight = 10.0 }
+                    .style { fontWeight = FontWeight.BOLD }
+                simMeanPopulationLabel = label().gridpaneConstraints { marginRight = 10.0 }
+                simTotalPopulationLabel = label()
+            }
+            row {
+                label("Resources:")
+                    .gridpaneConstraints { marginRight = 10.0 }
+                    .style { fontWeight = FontWeight.BOLD }
+                simMeanResourcesLabel = label().gridpaneConstraints { marginRight = 10.0 }
+                simTotalResourcesLabel = label()
+            }
+            row {
+                label("Elevation:")
+                    .gridpaneConstraints { marginRight = 10.0 }
+                    .style { fontWeight = FontWeight.BOLD }
+                simMeanElevationLabel = label().gridpaneConstraints { marginRight = 10.0 }
+                simTotalElevationLabel = label()
+            }
+            row {
+                label("Desirability:")
+                    .gridpaneConstraints { marginRight = 10.0 }
+                    .style { fontWeight = FontWeight.BOLD }
+                simMeanDesirabilityLabel = label().gridpaneConstraints { marginRight = 10.0 }
+                simTotalDesirabilityLabel = label()
             }
         }
     }
+
+
 
 }
